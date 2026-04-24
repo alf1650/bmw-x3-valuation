@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMW X3 sDrive20i — Sell or Keep? | Valuation Report</title>
+  <style>
+    :root {
+      --blue: #1a56db;
+      --blue-light: #e8f0fe;
+      --green: #046c4e;
+      --green-light: #def7ec;
+      --red: #c81e1e;
+      --red-light: #fde8e8;
+      --orange: #b45309;
+      --orange-light: #fffbeb;
+      --gray: #6b7280;
+      --gray-light: #f9fafb;
+      --border: #e5e7eb;
+      --text: #111827;
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f3f4f6;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ── HEADER ──────────────────────────────────────────── */
+    .header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%);
+      color: white;
+      padding: 36px 24px 32px;
+      text-align: center;
+    }
+    .header .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .header p  { font-size: 15px; opacity: 0.85; }
+    .header .meta {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 24px;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+    .header .meta span { opacity: 0.85; }
+    .header .meta strong { opacity: 1; }
+
+    /* ── LAYOUT ──────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* ── SECTION TITLES ──────────────────────────────────── */
+    .section-title {
+      font-size: 18px; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--blue); flex-shrink: 0;
+    }
+
+    /* ── CARDS GRID ──────────────────────────────────────── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+    }
+    .card .label { font-size: 12px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+    .card .value { font-size: 26px; font-weight: 700; color: var(--blue); }
+    .card .sub   { font-size: 12px; color: var(--gray); margin-top: 4px; }
+
+    /* ── ALERT BANNER ────────────────────────────────────── */
+    .alert {
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 32px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .alert-warn { background: #fffbeb; border: 1px solid #f59e0b; }
+    .alert-info { background: var(--blue-light); border: 1px solid #93c5fd; }
+    .alert-success { background: var(--green-light); border: 1px solid #6ee7b7; }
+    .alert-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
+    .alert-body .title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .alert-body p { font-size: 14px; color: #374151; }
+
+    /* ── PARF COMPARISON BOX ─────────────────────────────── */
+    .parf-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 600px) { .parf-grid { grid-template-columns: 1fr; } }
+    .parf-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: var(--card-shadow);
+      border-top: 4px solid transparent;
+    }
+    .parf-card.before { border-top-color: #10b981; }
+    .parf-card.after  { border-top-color: #ef4444; }
+    .parf-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+    .parf-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .parf-row:last-child { border-bottom: none; font-weight: 700; font-size: 15px; }
+    .parf-row .amt { font-weight: 600; }
+    .parf-row.highlight .amt { color: var(--green); font-size: 18px; }
+    .parf-row.highlight-red .amt { color: var(--red); font-size: 18px; }
+
+    /* ── TABLE ───────────────────────────────────────────── */
+    .table-wrap {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .table-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .table-header h2 { font-size: 16px; font-weight: 700; }
+    .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--gray-light); cursor: pointer;
+      transition: all .15s;
+    }
+    .filter-btn.active, .filter-btn:hover { background: var(--blue); color: white; border-color: var(--blue); }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th {
+      background: #f9fafb; padding: 12px 14px; text-align: left;
+      font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px;
+      color: var(--gray); border-bottom: 1px solid var(--border);
+      white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    th:hover { background: #f3f4f6; }
+    th .sort-icon { margin-left: 4px; opacity: .5; }
+    th.sorted { color: var(--blue); }
+    th.sorted .sort-icon { opacity: 1; }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f9fafb; }
+    tr.highlight-row td { background: #eff6ff; }
+    tr.highlight-row td:first-child { border-left: 3px solid var(--blue); }
+
+    .badge-trim {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-standard { background: #dbeafe; color: #1e40af; }
+    .badge-msport   { background: #fce7f3; color: #9d174d; }
+    .badge-xline    { background: #d1fae5; color: #065f46; }
+
+    .price-cell { font-weight: 700; color: var(--text); font-size: 15px; }
+    .depr-cell { color: var(--red); font-size: 13px; }
+    .owners-cell .dot-row { display: flex; gap: 3px; }
+    .owner-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+    .owner-dot.empty { background: #e5e7eb; }
+
+    /* mileage bar */
+    .mile-bar-wrap { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+    .mile-bar-bg { flex: 1; height: 5px; background: #e5e7eb; border-radius: 3px; }
+    .mile-bar { height: 5px; border-radius: 3px; background: var(--blue); }
+    .mile-text { font-size: 12px; white-space: nowrap; min-width: 60px; }
+
+    .coe-badge {
+      display: inline-block; padding: 3px 8px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    }
+    .coe-5plus { background: var(--green-light); color: var(--green); }
+    .coe-4to5  { background: var(--orange-light); color: var(--orange); }
+
+    .link-pill {
+      display: inline-block; padding: 3px 10px; border-radius: 8px;
+      background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 600;
+      text-decoration: none;
+    }
+    .link-pill:hover { background: var(--blue); color: white; }
+
+    .no-results { padding: 40px; text-align: center; color: var(--gray); }
+
+    /* ── VERDICT BOX ─────────────────────────────────────── */
+    .verdict {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 28px;
+      margin-bottom: 32px;
+    }
+    .verdict h2 { font-size: 20px; font-weight: 800; margin-bottom: 16px; }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+    @media (max-width: 600px) { .pros-cons { grid-template-columns: 1fr; } }
+    .pros-cons-col h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+    .pros-cons-col.pros h3 { color: var(--green); }
+    .pros-cons-col.cons h3 { color: var(--red); }
+    .pros-cons-col ul { list-style: none; }
+    .pros-cons-col li { font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: flex-start; }
+    .pros-cons-col li:last-child { border-bottom: none; }
+    .pros-cons-col.pros li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .pros-cons-col.cons li::before { content: "✗"; color: var(--red); font-weight: 700; flex-shrink: 0; }
+
+    /* ── PRICE RANGE VIZ ─────────────────────────────────── */
+    .price-range-wrap {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .range-bar-outer {
+      height: 24px; background: #e5e7eb; border-radius: 12px;
+      position: relative; margin: 20px 0 8px;
+    }
+    .range-bar-fill {
+      position: absolute; height: 100%; border-radius: 12px;
+      background: linear-gradient(90deg, #93c5fd, #1a56db);
+    }
+    .range-bar-you {
+      position: absolute; width: 3px; height: 36px; background: #ef4444;
+      top: -6px; border-radius: 2px;
+    }
+    .range-bar-you::after {
+      content: "Your car"; position: absolute; top: -20px; left: 50%;
+      transform: translateX(-50%); font-size: 10px; font-weight: 700;
+      color: #ef4444; white-space: nowrap;
+    }
+    .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray); }
+
+    /* ── DISCLAIMER ──────────────────────────────────────── */
+    .disclaimer {
+      font-size: 12px; color: var(--gray); text-align: center; margin-top: 24px;
+      padding: 0 16px;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 { font-size: 22px; }
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════ -->
+<div class="header">
+  <div class="badge" id="hdr-badge">Sell or Keep Analysis</div>
+  <h1>BMW X3 sDrive20i</h1>
+  <p>Registration: 23 Jun 2021 · COE Expiry: Jun 2031 · Singapore Market</p>
+  <div class="meta">
+    <span>Source: <strong>sgCarMart</strong></span>
+    <span>Data pulled: <strong id="hdr-pulled">—</strong></span>
+    <span>2021 listings found: <strong id="hdr-count">—</strong></span>
+    <span>⚠️ PARF cutoff: <strong>23 Jun 2026</strong> (<span id="hdr-days">—</span>d)</span>
+  </div>
+</div>
+
+<!-- ═══ MAIN ════════════════════════════════════════════════ -->
+<div class="container">
+
+  <!-- URGENT ALERT -->
+  <div class="alert alert-warn">
+    <div class="alert-icon">⏰</div>
+    <div class="alert-body">
+      <div class="title">PARF Rebate Drops in ~<span id="alert-days">—</span> Days — 23 Jun 2026</div>
+      <p>Your car turns 5 years old on 23 Jun 2026. PARF rebate drops from <strong>75% → 70% of ARF</strong> on that date. Based on an estimated ARF of ~$54,000–$60,000, this is approximately <strong>$2,700–$3,000 less</strong> you (or your buyer's dealer) will recover at deregistration. Selling now captures the higher PARF.</p>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="section-title"><span class="dot"></span>Current Market Snapshot (2021 BMW X3 sDrive20i)</div>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="label">Asking Price Range</div>
+      <div class="value" id="kpi-range">—</div>
+      <div class="sub"><span id="kpi-count">—</span> active listings (all variants, 2021)</div>
+    </div>
+    <div class="card">
+      <div class="label">Jun 2021 Reg Price Range</div>
+      <div class="value" id="kpi-jun-range">—</div>
+      <div class="sub"><span id="kpi-jun-count">—</span> closest to your reg date</div>
+    </div>
+    <div class="card">
+      <div class="label">Avg Depreciation</div>
+      <div class="value" id="kpi-depr">—</div>
+      <div class="sub">Across all 2021 listings</div>
+    </div>
+    <div class="card">
+      <div class="label">COE Remaining</div>
+      <div class="value">~5y 2m</div>
+      <div class="sub">COE expires Jun 2031</div>
+    </div>
+    <div class="card">
+      <div class="label">Est. Your Car Value</div>
+      <div class="value" id="est-value">—</div>
+      <div class="sub">Std / Jun 2021 comparables</div>
+    </div>
+    <div class="card">
+      <div class="label">PARF Rebate Now</div>
+      <div class="value">~$40.5k</div>
+      <div class="sub">75% of ARF ~$54k (drops to ~$37.8k after Jun 23)</div>
+    </div>
+  </div>
+
+  <!-- PRICE RANGE VIZ -->
+  <div class="price-range-wrap">
+    <div class="section-title" style="margin-bottom:4px"><span class="dot"></span>2021 Asking Price Range (All Variants)</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:8px">Red marker = estimated position of your standard sDrive20i (Jun 2021, ~70–100k km)</p>
+    <div class="range-bar-outer">
+      <!-- lowest $135,800 → highest $159,800 → range $24,000 -->
+      <!-- fill from 0 to 100% -->
+      <div class="range-bar-fill" style="left:0;right:0;"></div>
+      <!-- your car at ~$143k: ($143k-$135.8k)/$24k = 30% -->
+      <div class="range-bar-you" style="left: 30%;"></div>
+    </div>
+    <div class="range-labels">
+      <span>$135,800<br><small>Lowest (M-Sport, high mileage, 2 owners)</small></span>
+      <span style="text-align:center">$147,000–$150,000<br><small>★ Estimated your car</small></span>
+      <span style="text-align:right">$159,800<br><small>Highest (M-Sport, low mileage, 1 owner)</small></span>
+    </div>
+  </div>
+
+  <!-- PARF SELL NOW VS AFTER JUNE -->
+  <div class="section-title"><span class="dot"></span>Sell Now vs. After June 2026 — PARF Impact</div>
+  <div class="parf-grid">
+    <div class="parf-card before">
+      <h3>✅ Sell BEFORE 23 Jun 2026</h3>
+      <div class="parf-row"><span>Car Age</span><span class="amt">4y 11m – 5y 0m</span></div>
+      <div class="parf-row"><span>PARF Rate</span><span class="amt" style="color:var(--green)">75% of ARF</span></div>
+      <div class="parf-row"><span>Estimated ARF</span><span class="amt">~$54,000–$60,000</span></div>
+      <div class="parf-row"><span>PARF Rebate</span><span class="amt">~$40,500–$45,000</span></div>
+      <div class="parf-row"><span>COE Rebate (~62 mths left)</span><span class="amt">~$21,000–$26,000 <small>*</small></span></div>
+      <div class="parf-row"><span>Total Dereg Value</span><span class="amt" style="color:var(--green)">~$61,500–$71,000</span></div>
+      <div class="parf-row highlight"><span>Estimated Asking Price</span><span class="amt">~$143k–$152k</span></div>
+    </div>
+    <div class="parf-card after">
+      <h3>❌ Sell AFTER 23 Jun 2026</h3>
+      <div class="parf-row"><span>Car Age</span><span class="amt">5y+</span></div>
+      <div class="parf-row"><span>PARF Rate</span><span class="amt" style="color:var(--red)">70% of ARF (↓5%)</span></div>
+      <div class="parf-row"><span>Estimated ARF</span><span class="amt">~$54,000–$60,000</span></div>
+      <div class="parf-row"><span>PARF Rebate</span><span class="amt">~$37,800–$42,000</span></div>
+      <div class="parf-row"><span>COE Rebate (~58 mths left)</span><span class="amt">~$19,000–$24,000 <small>*</small></span></div>
+      <div class="parf-row"><span>Total Dereg Value</span><span class="amt" style="color:var(--red)">~$56,800–$66,000</span></div>
+      <div class="parf-row highlight-red"><span>Estimated Asking Price</span><span class="amt">~$138k–$148k</span></div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--gray);margin-bottom:32px">* COE rebate = (COE premium paid × remaining months / 120). The Jun 2021 COE premium for Cat B was approximately $72,000–$90,000 — verify via your vehicle's actual registration papers. Figures are estimates for decision-making purposes.</p>
+
+  <!-- LISTINGS TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <h2>📋 All Active sgCarMart Listings — 2021 BMW X3 sDrive20i</h2>
+      <div class="filter-btns" id="filter-btns">
+        <!-- injected by JS -->
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="listingsTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">Variant <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable(1)" class="sorted">Ask Price <span class="sort-icon">↑</span></th>
+            <th onclick="sortTable(2)">Reg Date <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable(3)">COE Left <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable(4)">Mileage <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable(5)">Owners <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable(6)">Depr/yr <span class="sort-icon">↕</span></th>
+            <th>Dealer</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+      <div class="no-results" id="noResults" style="display:none">No matching listings.</div>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <div class="section-title" style="margin-bottom:4px"><span class="dot"></span>Verdict: Should You Sell?</div>
+    <div class="alert alert-success" style="margin-bottom:16px; margin-top:12px">
+      <div class="alert-icon">💡</div>
+      <div class="alert-body">
+        <div class="title">Recommendation: Sell BEFORE 23 Jun 2026 if you plan to sell at all</div>
+        <p>The market is active (13 listings, quick turnover) and your car is at the <strong>sweet spot</strong> — ~5 years old, PARF still at 75%, ~5y COE remaining. Waiting past June costs you ~$2,700–$3,000 in PARF rebate and will lower buyer interest as the car enters its 5th year.</p>
+      </div>
+    </div>
+    <div class="pros-cons">
+      <div class="pros-cons-col pros">
+        <h3>Reasons to Sell NOW (before Jun 2026)</h3>
+        <ul>
+          <li>PARF rebate at 75% — lose ~$2,700–$3,000 after Jun 23</li>
+          <li>5-year-old car stigma avoided — buyers prefer "under 5 yrs"</li>
+          <li>Market is buoyant: asking prices $142k–$153k for Jun '21 equivalent</li>
+          <li>23-Jun-21 M-Sport listing active at $142,800 — market already validated</li>
+          <li>COE ~5y 2m left enhances buyer confidence</li>
+          <li>High COE environment keeps 2021 resale values elevated</li>
+        </ul>
+      </div>
+      <div class="pros-cons-col cons">
+        <h3>Reasons to Keep / Sell Later</h3>
+        <ul>
+          <li>Only ~$2,700–$3,000 PARF difference — not catastrophic if you love the car</li>
+          <li>Annual cost of ownership lower than depreciation if car is paid off</li>
+          <li>BMW X3 still well-regarded; holds value relatively well vs. peers</li>
+          <li>Selling now means finding a replacement at very high new car prices</li>
+          <li>If mileage is low (&lt;60k km), your car fetches premium — no rush</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER JUNE PROJECTION -->
+  <div class="alert alert-info">
+    <div class="alert-icon">📅</div>
+    <div class="alert-body">
+      <div class="title">Anticipated Price After June 2026</div>
+      <p>Post-June, expect asking prices for a Jun 2021 sDrive20i to drift to <strong>$136,000–$146,000</strong> (down ~$4,000–$6,000 from today), reflecting the PARF drop and the psychological "5-year-old car" discount. If COE prices remain high or rise, the drop may be smaller. Monitor sgCarMart listings in June to calibrate.</p>
+    </div>
+  </div>
+
+  <p class="disclaimer">
+    Data sourced from sgCarMart as of 25 Apr 2026. Prices are dealer asking prices — actual transaction prices may be 3–8% lower. ARF, COE, and PARF figures are estimates based on comparable registrations. Always verify your vehicle's actual ARF, COE premium, and LTA deregistration value via the <a href="https://www.lta.gov.sg/content/ltagov/en/industry_innovations/industry_matters/development_construction_resources/vehicle-type-approval/motoralts.html" style="color:var(--blue)">LTA OneMotoring portal</a> before making any financial decisions.
+  </p>
+</div>
+
+<!-- ═══ JS ═════════════════════════════════════════════════ -->
+<script>
+  // Data is loaded from data.json (auto-updated daily by GitHub Actions).
+  let listings = [];
+  let stats = {};
+  let daysToCutoff = null;
+  let currentFilter = 'all';
+  let currentSort = { key: 'price', dir: 'asc' };
+
+  // ── Formatters ─────────────────────────────────────────
+  const fmt$ = n => n == null ? '—' : '$' + n.toLocaleString();
+  const fmt$k = n => n == null ? '—' : '$' + (n / 1000).toFixed(1) + 'k';
+  const fmtRange$k = (lo, hi) => lo == null ? '—' : `${fmt$k(lo)}–${fmt$k(hi)}`;
+
+  function trimBadge(t) {
+    if (t === 'msport')   return `<span class="badge-trim badge-msport">M-Sport</span>`;
+    if (t === 'xline')    return `<span class="badge-trim badge-xline">xLine</span>`;
+    return `<span class="badge-trim badge-standard">Standard</span>`;
+  }
+  function coeBadge(str, months) {
+    const cls = months >= 60 ? 'coe-5plus' : 'coe-4to5';
+    return `<span class="coe-badge ${cls}">${str || '—'}</span>`;
+  }
+  function ownerDots(n) {
+    n = n || 0;
+    let h = '<div class="dot-row">';
+    for (let i = 0; i < Math.max(n, 3); i++) h += `<div class="owner-dot${i >= n ? ' empty' : ''}"></div>`;
+    return h + '</div>';
+  }
+  function mileBar(km) {
+    if (km == null) return '<span style="color:#9ca3af">—</span>';
+    const pct = Math.min(km / 140000 * 100, 100).toFixed(1);
+    const color = km > 100000 ? '#ef4444' : km > 70000 ? '#f59e0b' : '#1a56db';
+    return `<div class="mile-bar-wrap">
+      <div class="mile-bar-bg"><div class="mile-bar" style="width:${pct}%;background:${color}"></div></div>
+      <span class="mile-text">${(km / 1000).toFixed(0)}k km</span>
+    </div>`;
+  }
+  const isJun = l => /^\d{2}-Jun-2021$/.test(l.reg_date);
+
+  // ── KPI + header fill ──────────────────────────────────
+  function renderStats() {
+    const dataPulled = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    document.getElementById('hdr-pulled').textContent = dataPulled;
+    document.getElementById('hdr-count').textContent = `${stats.count || 0} active`;
+    document.getElementById('hdr-days').textContent = daysToCutoff ?? '—';
+    document.getElementById('alert-days').textContent = daysToCutoff ?? '—';
+    document.getElementById('kpi-range').textContent = fmtRange$k(stats.price_min, stats.price_max);
+    document.getElementById('kpi-count').textContent = stats.count || 0;
+    document.getElementById('kpi-jun-range').textContent = stats.jun_count
+      ? fmtRange$k(stats.jun_price_min, stats.jun_price_max)
+      : 'No Jun 2021 listings';
+    document.getElementById('kpi-jun-count').textContent = stats.jun_count || 0;
+    document.getElementById('kpi-depr').textContent = stats.depr_avg
+      ? '~$' + (Math.round(stats.depr_avg / 100) * 100).toLocaleString() + '/yr'
+      : '—';
+    document.getElementById('est-value').textContent = stats.est_your_car_low
+      ? fmtRange$k(stats.est_your_car_low, stats.est_your_car_high)
+      : fmtRange$k(stats.price_min, stats.price_max);
+  }
+
+  // ── Filter buttons (dynamic counts) ────────────────────
+  function renderFilters() {
+    const junCount = listings.filter(isJun).length;
+    const counts = {
+      all:      listings.length,
+      jun:      junCount,
+      standard: listings.filter(l => l.trim === 'standard').length,
+      msport:   listings.filter(l => l.trim === 'msport').length,
+      xline:    listings.filter(l => l.trim === 'xline').length,
+    };
+    const labels = { all: 'All', jun: 'Jun 2021', standard: 'Standard', msport: 'M-Sport', xline: 'xLine' };
+    const host = document.getElementById('filter-btns');
+    host.innerHTML = Object.keys(labels).map(k =>
+      `<button class="filter-btn${k === currentFilter ? ' active' : ''}" data-filter="${k}">
+         ${labels[k]} (${counts[k]})
+       </button>`
+    ).join('');
+    host.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentFilter = btn.dataset.filter;
+        renderFilters();
+        applyFilterAndSort();
+      });
+    });
+  }
+
+  // ── Table ──────────────────────────────────────────────
+  function renderTable(rows) {
+    const tbody = document.getElementById('tableBody');
+    const noRes = document.getElementById('noResults');
+    if (!rows.length) { tbody.innerHTML = ''; noRes.style.display = ''; return; }
+    noRes.style.display = 'none';
+    tbody.innerHTML = rows.map(l => {
+      const jun = isJun(l);
+      return `<tr class="${jun ? 'highlight-row' : ''}">
+        <td>${trimBadge(l.trim)}<br><small style="font-size:11px;color:#6b7280">${l.variant}</small></td>
+        <td class="price-cell">${fmt$(l.price)}</td>
+        <td style="white-space:nowrap">${l.reg_date}${jun ? ' <span style="color:var(--blue);font-size:11px;font-weight:700">★ Near match</span>' : ''}</td>
+        <td>${coeBadge(l.coe_left, l.coe_months)}</td>
+        <td>${mileBar(l.mileage)}</td>
+        <td class="owners-cell">${ownerDots(l.owners)}<small style="font-size:11px;color:var(--gray)">${l.owners || 0} owner${(l.owners || 0) > 1 ? 's' : ''}</small></td>
+        <td class="depr-cell">${l.depr_per_year ? '$' + l.depr_per_year.toLocaleString() + '/yr' : '—'}</td>
+        <td style="font-size:13px">${l.dealer || '—'}</td>
+        <td><a href="${l.url}" target="_blank" rel="noopener" class="link-pill">View →</a></td>
+      </tr>`;
+    }).join('');
+  }
+
+  const SORT_KEYS = ['variant', 'price', 'reg_date', 'coe_months', 'mileage', 'owners', 'depr_per_year'];
+  function sortTable(colIdx) {
+    const key = SORT_KEYS[colIdx];
+    if (currentSort.key === key) currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+    else { currentSort.key = key; currentSort.dir = 'asc'; }
+    document.querySelectorAll('th').forEach((th, i) => {
+      th.classList.toggle('sorted', i === colIdx);
+      const icon = th.querySelector('.sort-icon');
+      if (icon) icon.textContent = i === colIdx ? (currentSort.dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+    applyFilterAndSort();
+  }
+  window.sortTable = sortTable;
+
+  function applyFilterAndSort() {
+    let rows = listings.filter(l => {
+      if (currentFilter === 'all') return true;
+      if (currentFilter === 'jun') return isJun(l);
+      return l.trim === currentFilter;
+    });
+    const { key, dir } = currentSort;
+    const mul = dir === 'asc' ? 1 : -1;
+    rows.sort((a, b) => {
+      const av = a[key], bv = b[key];
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      if (typeof av === 'string') return mul * av.localeCompare(bv);
+      return mul * (av - bv);
+    });
+    renderTable(rows);
+  }
+
+  // ── Load ───────────────────────────────────────────────
+  async function load() {
+    try {
+      const resp = await fetch('./data.json', { cache: 'no-cache' });
+      const d = await resp.json();
+      listings = d.listings || [];
+      stats = d.stats || {};
+      daysToCutoff = d.days_to_parf_cutoff;
+      if (d.generated_at) {
+        document.getElementById('hdr-pulled').textContent =
+          new Date(d.generated_at).toLocaleDateString('en-GB',
+            { day: '2-digit', month: 'short', year: 'numeric' });
+      }
+    } catch (e) {
+      document.getElementById('tableBody').innerHTML =
+        `<tr><td colspan="9" style="padding:24px;text-align:center;color:var(--red)">
+          Failed to load data.json — run <code>python3 update.py</code> first.
+        </td></tr>`;
+      return;
+    }
+    renderStats();
+    renderFilters();
+    applyFilterAndSort();
+  }
+  load();
+</script>
+</body>
+</html>
+
