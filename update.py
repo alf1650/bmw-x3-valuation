@@ -7,6 +7,7 @@ Uses stdlib only — no external dependencies.
 """
 import json
 import re
+import sys
 import urllib.request
 from datetime import datetime, timezone, date
 from pathlib import Path
@@ -30,8 +31,19 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/120.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/html,application/xhtml+xml",
-    "Accept-Language": "en-US,en;q=0.9",
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "image/avif,image/webp,*/*;q=0.8"
+    ),
+    "Accept-Language": "en-SG,en-US;q=0.9,en;q=0.8",
+    "Accept-Encoding": "gzip, deflate",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
 }
 
 OUT_FILE = Path(__file__).parent / "data.json"
@@ -39,9 +51,33 @@ OUT_FILE = Path(__file__).parent / "data.json"
 
 # ── SCRAPER ─────────────────────────────────────────────────────────────
 def fetch(url: str) -> str:
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return resp.read().decode("utf-8", errors="ignore")
+    import gzip
+    import time
+    import zlib
+
+    last_err = None
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw = resp.read()
+                enc = resp.headers.get("Content-Encoding", "").lower()
+                if enc == "gzip":
+                    raw = gzip.decompress(raw)
+                elif enc == "deflate":
+                    raw = zlib.decompress(raw)
+                elif enc == "br":
+                    try:
+                        import brotli  # type: ignore
+                        raw = brotli.decompress(raw)
+                    except ImportError:
+                        # Server honored br despite us not supporting it; retry without br
+                        pass
+                return raw.decode("utf-8", errors="ignore")
+        except Exception as e:
+            last_err = e
+            time.sleep(2 ** attempt)
+    raise last_err  # type: ignore[misc]
 
 
 # sgCarMart embeds listings in Next.js RSC payload as escaped JSON:
@@ -210,6 +246,15 @@ def main() -> None:
         (l for l in all_listings if l["reg_year"] == 2021),
         key=lambda x: x["price"],
     )
+
+    if not all_listings:
+        print(
+            "ERROR: 0 listings parsed from sgCarMart. "
+            "Likely IP-blocked or page structure changed. "
+            "Preserving existing data.json and failing the job.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     stats = compute_stats(listings_2021)
 
