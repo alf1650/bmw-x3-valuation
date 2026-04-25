@@ -261,6 +261,49 @@
       padding: 0 16px;
     }
 
+    /* ── YOUR CAR INPUT PANEL ────────────────────────────── */
+    .your-car {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .input-field label {
+      display: block; font-size: 12px; font-weight: 600;
+      color: var(--gray); text-transform: uppercase; letter-spacing: .4px;
+      margin-bottom: 6px;
+    }
+    .input-field input, .input-field select {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 15px; background: white;
+      font-family: inherit;
+    }
+    .input-field input:focus, .input-field select:focus {
+      outline: none; border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+    .input-hint { font-size: 11px; color: var(--gray); margin-top: 4px; }
+    .adjusted-value {
+      margin-top: 20px; padding: 18px;
+      background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+      border-radius: 10px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 600px) { .adjusted-value { grid-template-columns: 1fr; } }
+    .adj-block .adj-label { font-size: 12px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .4px; }
+    .adj-block .adj-value { font-size: 22px; font-weight: 700; color: var(--blue); margin-top: 4px; }
+    .adj-block .adj-detail { font-size: 12px; color: var(--gray); margin-top: 4px; }
+    .adj-pos { color: var(--green) !important; }
+    .adj-neg { color: var(--red) !important; }
+
     @media (max-width: 768px) {
       .header h1 { font-size: 22px; }
       .cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -326,6 +369,58 @@
       <div class="label">PARF Rebate Now</div>
       <div class="value">~$40.5k</div>
       <div class="sub">75% of ARF ~$54k (drops to ~$37.8k after Jun 23)</div>
+    </div>
+  </div>
+
+  <!-- YOUR CAR DETAILS -->
+  <div class="your-car">
+    <div class="section-title" style="margin-bottom:4px"><span class="dot"></span>Your Car Details</div>
+    <p style="font-size:13px;color:var(--gray)">Enter your specifics to refine the estimated value. Saved locally in your browser.</p>
+    <div class="input-grid">
+      <div class="input-field">
+        <label for="in-mileage">Mileage (km)</label>
+        <input id="in-mileage" type="number" min="0" step="1000" placeholder="e.g. 65000" />
+        <div class="input-hint">Lower = higher value. Avg for 5y BMW: ~80k km.</div>
+      </div>
+      <div class="input-field">
+        <label for="in-owners">Number of Owners</label>
+        <select id="in-owners">
+          <option value="1">1 owner (you)</option>
+          <option value="2">2 owners</option>
+          <option value="3">3 owners</option>
+          <option value="4">4+ owners</option>
+        </select>
+        <div class="input-hint">1 owner commands a premium.</div>
+      </div>
+      <div class="input-field">
+        <label for="in-warranty">Warranty Status</label>
+        <select id="in-warranty">
+          <option value="active">Active (manufacturer or extended)</option>
+          <option value="expired">Expired</option>
+          <option value="extended">Extended warranty available</option>
+        </select>
+        <div class="input-hint">Active warranty adds buyer confidence.</div>
+      </div>
+      <div class="input-field">
+        <label for="in-trim">Variant</label>
+        <select id="in-trim">
+          <option value="standard">Standard</option>
+          <option value="msport">M-Sport</option>
+          <option value="xline">xLine</option>
+        </select>
+        <div class="input-hint">M-Sport typically fetches a premium.</div>
+      </div>
+    </div>
+    <div class="adjusted-value">
+      <div class="adj-block">
+        <div class="adj-label">Adjusted Estimated Value</div>
+        <div class="adj-value" id="adj-estimate">—</div>
+        <div class="adj-detail" id="adj-detail">Enter your details above</div>
+      </div>
+      <div class="adj-block">
+        <div class="adj-label">Adjustment Breakdown</div>
+        <div id="adj-breakdown" style="font-size:13px;color:var(--text);margin-top:6px;line-height:1.7">—</div>
+      </div>
     </div>
   </div>
 
@@ -618,8 +713,127 @@
     renderStats();
     renderFilters();
     applyFilterAndSort();
+    initYourCar();
   }
   load();
+
+  // ── Your Car adjustment ────────────────────────────────
+  const STORAGE_KEY = 'bmw-x3-your-car-v1';
+  const YOUR_CAR_DEFAULTS = { mileage: '', owners: '1', warranty: 'active', trim: 'standard' };
+
+  function readYourCar() {
+    return {
+      mileage: document.getElementById('in-mileage').value,
+      owners:  document.getElementById('in-owners').value,
+      warranty: document.getElementById('in-warranty').value,
+      trim:    document.getElementById('in-trim').value,
+    };
+  }
+  function writeYourCar(v) {
+    document.getElementById('in-mileage').value = v.mileage ?? '';
+    document.getElementById('in-owners').value = v.owners ?? '1';
+    document.getElementById('in-warranty').value = v.warranty ?? 'active';
+    document.getElementById('in-trim').value = v.trim ?? 'standard';
+  }
+
+  function computeBaseline() {
+    // Base estimate: mid-point of Jun 2021 listings if available, else all 2021
+    const lo = stats.est_your_car_low ?? stats.price_min;
+    const hi = stats.est_your_car_high ?? stats.price_max;
+    if (lo == null || hi == null) return null;
+    return (lo + hi) / 2;
+  }
+
+  function computeAdjustment(v, base) {
+    // Returns array of { label, delta_pct, delta_abs }
+    const adj = [];
+
+    // Mileage: ±1.5% per 10k km from 80k baseline, capped at ±10%
+    const km = parseInt(v.mileage, 10);
+    if (Number.isFinite(km) && km > 0) {
+      const diff10k = (80000 - km) / 10000;       // +ve if lower than avg
+      let pct = diff10k * 1.5;
+      pct = Math.max(-10, Math.min(10, pct));
+      adj.push({
+        label: `Mileage ${km.toLocaleString()} km vs 80k avg`,
+        pct,
+      });
+    }
+
+    // Owners: 1 = +2%, 2 = 0%, 3 = -3%, 4+ = -6%
+    const ownerPct = { '1': 2, '2': 0, '3': -3, '4': -6 }[v.owners] ?? 0;
+    if (ownerPct !== 0) {
+      adj.push({ label: `${v.owners} owner${v.owners === '1' ? '' : 's'}`, pct: ownerPct });
+    }
+
+    // Warranty: active +2%, extended +3%, expired 0%
+    const warPct = { active: 2, extended: 3, expired: 0 }[v.warranty] ?? 0;
+    if (warPct !== 0) {
+      adj.push({ label: `Warranty: ${v.warranty}`, pct: warPct });
+    }
+
+    // Trim: standard 0, msport +3%, xline +1%
+    const trimPct = { standard: 0, msport: 3, xline: 1 }[v.trim] ?? 0;
+    if (trimPct !== 0) {
+      adj.push({ label: `Variant: ${v.trim === 'msport' ? 'M-Sport' : v.trim === 'xline' ? 'xLine' : 'Standard'}`, pct: trimPct });
+    }
+
+    // Compute absolute deltas
+    let runningTotal = 0;
+    adj.forEach(a => {
+      a.abs = Math.round(base * (a.pct / 100));
+      runningTotal += a.abs;
+    });
+    return { adjustments: adj, totalDelta: runningTotal };
+  }
+
+  function renderYourCar() {
+    const v = readYourCar();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(v));
+
+    const base = computeBaseline();
+    if (base == null) {
+      document.getElementById('adj-estimate').textContent = '—';
+      document.getElementById('adj-detail').textContent = 'No baseline data available';
+      document.getElementById('adj-breakdown').textContent = '—';
+      return;
+    }
+    const { adjustments, totalDelta } = computeAdjustment(v, base);
+    const adjusted = base + totalDelta;
+    const lo = Math.round(adjusted * 0.97);
+    const hi = Math.round(adjusted * 1.03);
+
+    document.getElementById('adj-estimate').textContent = fmt$k(lo) + '–' + fmt$k(hi);
+    const baseTxt = fmt$k(Math.round(base));
+    const sign = totalDelta >= 0 ? '+' : '';
+    const cls = totalDelta >= 0 ? 'adj-pos' : 'adj-neg';
+    document.getElementById('adj-detail').innerHTML =
+      `Baseline ${baseTxt} <span class="${cls}">${sign}${fmt$(totalDelta)}</span> (±3% asking-price band)`;
+
+    if (!adjustments.length) {
+      document.getElementById('adj-breakdown').textContent = 'No adjustments applied — equals market baseline.';
+    } else {
+      document.getElementById('adj-breakdown').innerHTML = adjustments.map(a => {
+        const aSign = a.abs >= 0 ? '+' : '';
+        const aCls = a.abs >= 0 ? 'adj-pos' : 'adj-neg';
+        return `• ${a.label}: <span class="${aCls}">${aSign}${a.pct.toFixed(1)}% (${aSign}${fmt$(a.abs)})</span>`;
+      }).join('<br>');
+    }
+  }
+
+  function initYourCar() {
+    let saved = YOUR_CAR_DEFAULTS;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) saved = { ...YOUR_CAR_DEFAULTS, ...JSON.parse(raw) };
+    } catch (e) {}
+    writeYourCar(saved);
+    ['in-mileage', 'in-owners', 'in-warranty', 'in-trim'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderYourCar);
+      document.getElementById(id).addEventListener('change', renderYourCar);
+    });
+    renderYourCar();
+  }
 </script>
 </body>
 </html>
