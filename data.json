@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-04-24T18:05:06.920854+00:00",
+  "generated_at": "2026-04-25T04:31:25.184442+00:00",
   "your_car": {
     "model": "BMW X3 sDrive20i",
     "reg_date": "23-Jun-2021",
     "parf_cutoff": "23-Jun-2026"
   },
-  "days_to_parf_cutoff": 60,
+  "days_to_parf_cutoff": 59,
   "stats": {},
   "listings": [],
   "all_listings_count": 0,
