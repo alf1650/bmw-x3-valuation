@@ -304,6 +304,45 @@
     .adj-pos { color: var(--green) !important; }
     .adj-neg { color: var(--red) !important; }
 
+    /* ── EV COMPARISON ───────────────────────────────────── */
+    .ev-panel {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+      margin-bottom: 32px;
+      border-top: 4px solid #10b981;
+    }
+    .ev-result {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .ev-stat {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .ev-stat .ev-label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .4px; }
+    .ev-stat .ev-value { font-size: 22px; font-weight: 700; color: var(--green); margin-top: 4px; }
+    .ev-stat .ev-sub { font-size: 11px; color: var(--gray); margin-top: 4px; }
+    .ev-stat.neg { background: #fef2f2; border-color: #fecaca; }
+    .ev-stat.neg .ev-value { color: var(--red); }
+    .ev-breakdown {
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--gray-light);
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .ev-breakdown table { width: 100%; border-collapse: collapse; }
+    .ev-breakdown td { padding: 4px 0; }
+    .ev-breakdown td:nth-child(2) { text-align: right; font-weight: 600; }
+    .ev-breakdown tr.total td { border-top: 1px solid var(--border); padding-top: 8px; font-weight: 700; }
+
     @media (max-width: 768px) {
       .header h1 { font-size: 22px; }
       .cards-grid { grid-template-columns: repeat(2, 1fr); }
@@ -541,6 +580,49 @@
       <div class="title">Anticipated Price After June 2026</div>
       <p>Post-June, expect asking prices for a Jun 2021 sDrive20i to drift to <strong>$136,000–$146,000</strong> (down ~$4,000–$6,000 from today), reflecting the PARF drop and the psychological "5-year-old car" discount. If COE prices remain high or rise, the drop may be smaller. Monitor sgCarMart listings in June to calibrate.</p>
     </div>
+  </div>
+
+  <!-- EV SWITCH ASSESSMENT -->
+  <div class="ev-panel">
+    <div class="section-title" style="margin-bottom:4px"><span class="dot" style="background:#10b981"></span>Optional: Switch to EV — Running Cost Comparison</div>
+    <p style="font-size:13px;color:var(--gray)">Compare BMW X3 sDrive20i (2.0L petrol) vs an equivalent EV. Adjust assumptions to match your usage. Saved locally.</p>
+    <div class="input-grid">
+      <div class="input-field">
+        <label for="ev-annual-km">Annual Mileage (km/yr)</label>
+        <input id="ev-annual-km" type="number" min="0" step="1000" value="15000" />
+        <div class="input-hint">SG average: 15,000–20,000 km/yr.</div>
+      </div>
+      <div class="input-field">
+        <label for="ev-petrol-price">Petrol Price (S$/L, 95)</label>
+        <input id="ev-petrol-price" type="number" min="0" step="0.05" value="3.00" />
+        <div class="input-hint">Current ~S$3.00/L for 95-octane.</div>
+      </div>
+      <div class="input-field">
+        <label for="ev-petrol-econ">X3 Fuel Economy (L/100km)</label>
+        <input id="ev-petrol-econ" type="number" min="0" step="0.1" value="8.5" />
+        <div class="input-hint">BMW X3 sDrive20i: ~8–9 L/100km mixed.</div>
+      </div>
+      <div class="input-field">
+        <label for="ev-elec-price">Electricity (S$/kWh)</label>
+        <input id="ev-elec-price" type="number" min="0" step="0.01" value="0.35" />
+        <div class="input-hint">Home charging ~$0.30, public DC ~$0.55.</div>
+      </div>
+      <div class="input-field">
+        <label for="ev-elec-econ">EV Consumption (kWh/100km)</label>
+        <input id="ev-elec-econ" type="number" min="0" step="0.5" value="18" />
+        <div class="input-hint">Mid-size EV (e.g. iX3, EV6, Model Y): 16–20.</div>
+      </div>
+      <div class="input-field">
+        <label for="ev-purchase-premium">EV Purchase Premium (S$)</label>
+        <input id="ev-purchase-premium" type="number" min="0" step="1000" value="20000" />
+        <div class="input-hint">Net cost above selling your X3 (after EV rebates).</div>
+      </div>
+    </div>
+    <div class="ev-result" id="ev-result"></div>
+    <div class="ev-breakdown" id="ev-breakdown"></div>
+    <p style="font-size:11px;color:var(--gray);margin-top:12px">
+      Assumptions: petrol road tax ~S$1,210/yr (1998cc), EV road tax ~S$1,400/yr (similar power), petrol maintenance ~S$1,800/yr, EV maintenance ~S$700/yr, petrol insurance ~S$2,400/yr, EV insurance ~S$2,600/yr. Excludes depreciation, COE, and resale value differences.
+    </p>
   </div>
 
   <p class="disclaimer">
@@ -833,6 +915,90 @@
       document.getElementById(id).addEventListener('change', renderYourCar);
     });
     renderYourCar();
+    initEV();
+  }
+
+  // ── EV Comparison ──────────────────────────────────────
+  const EV_KEY = 'bmw-x3-ev-v1';
+  const EV_FIELDS = ['ev-annual-km', 'ev-petrol-price', 'ev-petrol-econ', 'ev-elec-price', 'ev-elec-econ', 'ev-purchase-premium'];
+  // Annual fixed costs (S$/yr)
+  const PETROL_ROAD_TAX = 1210;
+  const EV_ROAD_TAX     = 1400;
+  const PETROL_MAINT    = 1800;
+  const EV_MAINT        = 700;
+  const PETROL_INS      = 2400;
+  const EV_INS          = 2600;
+
+  function readEV() {
+    const out = {};
+    EV_FIELDS.forEach(f => { out[f] = parseFloat(document.getElementById(f).value) || 0; });
+    return out;
+  }
+
+  function renderEV() {
+    const v = readEV();
+    localStorage.setItem(EV_KEY, JSON.stringify(v));
+
+    const km = v['ev-annual-km'];
+    const petrolFuelCost = (km / 100) * v['ev-petrol-econ'] * v['ev-petrol-price'];
+    const evEnergyCost   = (km / 100) * v['ev-elec-econ']   * v['ev-elec-price'];
+
+    const petrolTotal = petrolFuelCost + PETROL_ROAD_TAX + PETROL_MAINT + PETROL_INS;
+    const evTotal     = evEnergyCost   + EV_ROAD_TAX     + EV_MAINT     + EV_INS;
+    const annualSaving = petrolTotal - evTotal;
+
+    const premium = v['ev-purchase-premium'];
+    const breakeven = annualSaving > 0 ? (premium / annualSaving) : null;
+    const fiveYearNet = annualSaving * 5 - premium;
+
+    const fmt = n => '$' + Math.round(n).toLocaleString();
+    const fmtSign = n => (n >= 0 ? '+' : '−') + '$' + Math.abs(Math.round(n)).toLocaleString();
+
+    document.getElementById('ev-result').innerHTML = `
+      <div class="ev-stat ${annualSaving < 0 ? 'neg' : ''}">
+        <div class="ev-label">Annual Saving</div>
+        <div class="ev-value">${fmtSign(annualSaving)}/yr</div>
+        <div class="ev-sub">EV vs petrol running costs</div>
+      </div>
+      <div class="ev-stat ${annualSaving < 0 ? 'neg' : ''}">
+        <div class="ev-label">5-Year Saving</div>
+        <div class="ev-value">${fmtSign(annualSaving * 5)}</div>
+        <div class="ev-sub">Before purchase premium</div>
+      </div>
+      <div class="ev-stat ${fiveYearNet < 0 ? 'neg' : ''}">
+        <div class="ev-label">Net After 5 yrs</div>
+        <div class="ev-value">${fmtSign(fiveYearNet)}</div>
+        <div class="ev-sub">Saving minus EV premium of ${fmt(premium)}</div>
+      </div>
+      <div class="ev-stat ${(!breakeven || breakeven > 5) ? 'neg' : ''}">
+        <div class="ev-label">Breakeven</div>
+        <div class="ev-value">${breakeven == null ? 'Never' : breakeven.toFixed(1) + ' yrs'}</div>
+        <div class="ev-sub">Years to recoup EV premium</div>
+      </div>
+    `;
+
+    document.getElementById('ev-breakdown').innerHTML = `
+      <strong>Annual cost breakdown</strong>
+      <table>
+        <tr><td>Fuel — petrol (${(km/100).toFixed(0)} × ${v['ev-petrol-econ']} L × $${v['ev-petrol-price'].toFixed(2)})</td><td>${fmt(petrolFuelCost)}</td><td style="text-align:center;color:var(--gray);font-size:12px">vs</td><td>Energy — EV (${(km/100).toFixed(0)} × ${v['ev-elec-econ']} kWh × $${v['ev-elec-price'].toFixed(2)})</td><td>${fmt(evEnergyCost)}</td></tr>
+        <tr><td>Road tax (petrol)</td><td>${fmt(PETROL_ROAD_TAX)}</td><td></td><td>Road tax (EV)</td><td>${fmt(EV_ROAD_TAX)}</td></tr>
+        <tr><td>Maintenance (petrol)</td><td>${fmt(PETROL_MAINT)}</td><td></td><td>Maintenance (EV)</td><td>${fmt(EV_MAINT)}</td></tr>
+        <tr><td>Insurance (petrol)</td><td>${fmt(PETROL_INS)}</td><td></td><td>Insurance (EV)</td><td>${fmt(EV_INS)}</td></tr>
+        <tr class="total"><td>Total petrol/yr</td><td>${fmt(petrolTotal)}</td><td></td><td>Total EV/yr</td><td>${fmt(evTotal)}</td></tr>
+      </table>
+    `;
+  }
+
+  function initEV() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(EV_KEY) || '{}'); } catch (e) {}
+    EV_FIELDS.forEach(f => {
+      if (saved[f] != null && !Number.isNaN(saved[f])) {
+        document.getElementById(f).value = saved[f];
+      }
+      document.getElementById(f).addEventListener('input', renderEV);
+    });
+    renderEV();
   }
 </script>
 </body>
