@@ -6,8 +6,10 @@ Runs daily via GitHub Actions (see .github/workflows/update-data.yml).
 Uses stdlib only — no external dependencies.
 """
 import json
+import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, date
 from pathlib import Path
@@ -50,15 +52,28 @@ OUT_FILE = Path(__file__).parent / "data.json"
 
 
 # ── SCRAPER ─────────────────────────────────────────────────────────────
+# Optional Cloudflare Worker proxy (sgCarMart blocks GitHub Actions IPs).
+# When SGCARMART_PROXY_URL is set, requests are routed through it.
+PROXY_URL = os.environ.get("SGCARMART_PROXY_URL", "").rstrip("/")
+PROXY_TOKEN = os.environ.get("SGCARMART_PROXY_TOKEN", "")
+
+
 def fetch(url: str) -> str:
     import gzip
     import time
     import zlib
 
+    if PROXY_URL:
+        request_url = f"{PROXY_URL}/?url={urllib.parse.quote(url, safe='')}"
+        headers = {**HEADERS, "x-proxy-token": PROXY_TOKEN}
+    else:
+        request_url = url
+        headers = HEADERS
+
     last_err = None
     for attempt in range(3):
         try:
-            req = urllib.request.Request(url, headers=HEADERS)
+            req = urllib.request.Request(request_url, headers=headers)
             with urllib.request.urlopen(req, timeout=30) as resp:
                 raw = resp.read()
                 enc = resp.headers.get("Content-Encoding", "").lower()
@@ -66,13 +81,6 @@ def fetch(url: str) -> str:
                     raw = gzip.decompress(raw)
                 elif enc == "deflate":
                     raw = zlib.decompress(raw)
-                elif enc == "br":
-                    try:
-                        import brotli  # type: ignore
-                        raw = brotli.decompress(raw)
-                    except ImportError:
-                        # Server honored br despite us not supporting it; retry without br
-                        pass
                 return raw.decode("utf-8", errors="ignore")
         except Exception as e:
             last_err = e
