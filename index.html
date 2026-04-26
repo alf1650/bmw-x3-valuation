@@ -134,6 +134,69 @@
     .parf-row.highlight .amt { color: var(--green); font-size: 18px; }
     .parf-row.highlight-red .amt { color: var(--red); font-size: 18px; }
 
+    /* ── COE MARKET CONTEXT ─────────────────────────────── */
+    .coe-section { margin-bottom: 32px; }
+    .coe-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 700px) { .coe-kpis { grid-template-columns: repeat(2, 1fr); } }
+    .coe-kpi {
+      background: white;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: var(--card-shadow);
+      border-left: 3px solid var(--blue);
+    }
+    .coe-kpi.delta-up   { border-left-color: var(--red); }
+    .coe-kpi.delta-down { border-left-color: var(--green); }
+    .coe-kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--gray); font-weight: 600; }
+    .coe-kpi .value { font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--text); }
+    .coe-kpi .sub { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .coe-kpi.delta-up .value   { color: var(--red); }
+    .coe-kpi.delta-down .value { color: var(--green); }
+
+    .coe-chart-wrap {
+      background: white;
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 16px;
+    }
+    .coe-chart-wrap h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .coe-chart-wrap .sub { font-size: 12px; color: var(--gray); margin-bottom: 12px; }
+    .coe-spark { width: 100%; height: 110px; display: block; }
+    .coe-spark-axis { stroke: #e5e7eb; stroke-width: 1; }
+    .coe-spark-line { stroke: var(--blue); stroke-width: 2; fill: none; }
+    .coe-spark-area { fill: rgba(26,86,219,0.08); }
+    .coe-spark-dot  { fill: var(--blue); }
+    .coe-spark-paid { stroke: var(--green); stroke-dasharray: 4 3; stroke-width: 1.5; }
+    .coe-spark-label { font-size: 10px; fill: var(--gray); }
+
+    .coe-commentary {
+      background: #f0f9ff;
+      border-left: 3px solid var(--blue);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .coe-commentary strong { color: var(--blue); }
+
+    .pqp-info {
+      background: var(--gray-light);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+    .pqp-info strong { color: var(--text); }
+
     /* ── TABLE ───────────────────────────────────────────── */
     .table-wrap {
       background: white;
@@ -481,6 +544,42 @@
     </div>
   </div>
 
+  <!-- ═══ COE MARKET CONTEXT ═════════════════════════════ -->
+  <div class="coe-section" id="coe-section" style="display:none">
+    <div class="section-title"><span class="dot" style="background:#1a56db"></span>COE Market Context — Cat B (data.gov.sg)</div>
+    <div class="coe-kpis">
+      <div class="coe-kpi">
+        <div class="label">Latest Cat B</div>
+        <div class="value" id="coe-latest">—</div>
+        <div class="sub" id="coe-latest-sub">—</div>
+      </div>
+      <div class="coe-kpi">
+        <div class="label">Your Jun 2021 COE</div>
+        <div class="value" id="coe-paid">—</div>
+        <div class="sub" id="coe-paid-sub">—</div>
+      </div>
+      <div class="coe-kpi" id="coe-delta-kpi">
+        <div class="label">Δ vs. What You Paid</div>
+        <div class="value" id="coe-delta">—</div>
+        <div class="sub" id="coe-delta-sub">Replacement-cost gap</div>
+      </div>
+      <div class="coe-kpi">
+        <div class="label">3-mo PQP Avg</div>
+        <div class="value" id="coe-pqp">—</div>
+        <div class="sub">Approx. renewal price (10-yr)</div>
+      </div>
+    </div>
+
+    <div class="coe-chart-wrap">
+      <h4>12-Month Cat B Trend</h4>
+      <div class="sub" id="coe-chart-sub">—</div>
+      <svg class="coe-spark" id="coe-spark" preserveAspectRatio="none" viewBox="0 0 600 110"></svg>
+    </div>
+
+    <div class="coe-commentary" id="coe-commentary">—</div>
+    <div class="pqp-info" id="coe-pqp-info" style="display:none"></div>
+  </div>
+
   <!-- PARF SELL NOW VS AFTER JUNE -->
   <div class="section-title"><span class="dot"></span>Sell Now vs. After June 2026 — PARF Impact</div>
   <div class="parf-grid">
@@ -490,8 +589,8 @@
       <div class="parf-row"><span>PARF Rate</span><span class="amt" style="color:var(--green)">75% of ARF</span></div>
       <div class="parf-row"><span>Estimated ARF</span><span class="amt">~$54,000–$60,000</span></div>
       <div class="parf-row"><span>PARF Rebate</span><span class="amt">~$40,500–$45,000</span></div>
-      <div class="parf-row"><span>COE Rebate (~62 mths left)</span><span class="amt">~$21,000–$26,000 <small>*</small></span></div>
-      <div class="parf-row"><span>Total Dereg Value</span><span class="amt" style="color:var(--green)">~$61,500–$71,000</span></div>
+      <div class="parf-row"><span id="coe-row-now-label">COE Rebate</span><span class="amt" id="coe-row-now">~$21,000–$26,000 <small>*</small></span></div>
+      <div class="parf-row"><span>Total Dereg Value</span><span class="amt" id="dereg-now" style="color:var(--green)">~$61,500–$71,000</span></div>
       <div class="parf-row highlight"><span>Estimated Asking Price</span><span class="amt">~$143k–$152k</span></div>
     </div>
     <div class="parf-card after">
@@ -500,12 +599,12 @@
       <div class="parf-row"><span>PARF Rate</span><span class="amt" style="color:var(--red)">70% of ARF (↓5%)</span></div>
       <div class="parf-row"><span>Estimated ARF</span><span class="amt">~$54,000–$60,000</span></div>
       <div class="parf-row"><span>PARF Rebate</span><span class="amt">~$37,800–$42,000</span></div>
-      <div class="parf-row"><span>COE Rebate (~58 mths left)</span><span class="amt">~$19,000–$24,000 <small>*</small></span></div>
-      <div class="parf-row"><span>Total Dereg Value</span><span class="amt" style="color:var(--red)">~$56,800–$66,000</span></div>
+      <div class="parf-row"><span id="coe-row-after-label">COE Rebate</span><span class="amt" id="coe-row-after">~$19,000–$24,000 <small>*</small></span></div>
+      <div class="parf-row"><span>Total Dereg Value</span><span class="amt" id="dereg-after" style="color:var(--red)">~$56,800–$66,000</span></div>
       <div class="parf-row highlight-red"><span>Estimated Asking Price</span><span class="amt">~$138k–$148k</span></div>
     </div>
   </div>
-  <p style="font-size:12px;color:var(--gray);margin-bottom:32px">* COE rebate = (COE premium paid × remaining months / 120). The Jun 2021 COE premium for Cat B was approximately $72,000–$90,000 — verify via your vehicle's actual registration papers. Figures are estimates for decision-making purposes.</p>
+  <p style="font-size:12px;color:var(--gray);margin-bottom:32px" id="coe-rebate-footnote">* COE rebate = COE premium paid × remaining months / 120. Figures use the data.gov.sg Cat B average for your Jun 2021 reg month. Override <code>coe_paid</code> in <code>update.py</code> if you have your exact LTA figure.</p>
 
   <!-- LISTINGS TABLE -->
   <div class="table-wrap">
@@ -551,7 +650,7 @@
     <div class="pros-cons">
       <div class="pros-cons-col pros">
         <h3>Reasons to Sell NOW (before Jun 2026)</h3>
-        <ul>
+        <ul id="verdict-pros-sell">
           <li>PARF rebate at 75% — lose ~$2,700–$3,000 after Jun 23</li>
           <li>5-year-old car stigma avoided — buyers prefer "under 5 yrs"</li>
           <li>Market is buoyant: asking prices $142k–$153k for Jun '21 equivalent</li>
@@ -562,7 +661,7 @@
       </div>
       <div class="pros-cons-col cons">
         <h3>Reasons to Keep / Sell Later</h3>
-        <ul>
+        <ul id="verdict-pros-keep">
           <li>Only ~$2,700–$3,000 PARF difference — not catastrophic if you love the car</li>
           <li>Annual cost of ownership lower than depreciation if car is paid off</li>
           <li>BMW X3 still well-regarded; holds value relatively well vs. peers</li>
@@ -635,6 +734,7 @@
   // Data is loaded from data.json (auto-updated daily by GitHub Actions).
   let listings = [];
   let stats = {};
+  let coe = null;
   let daysToCutoff = null;
   let currentFilter = 'all';
   let currentSort = { key: 'price', dir: 'asc' };
@@ -689,6 +789,169 @@
     document.getElementById('est-value').textContent = stats.est_your_car_low
       ? fmtRange$k(stats.est_your_car_low, stats.est_your_car_high)
       : fmtRange$k(stats.price_min, stats.price_max);
+  }
+
+  // ── COE Market Context ────────────────────────────────
+  function fmtMonth(ym) {
+    if (!ym) return '—';
+    const [y, m] = ym.split('-').map(Number);
+    return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  }
+
+  function renderCoeSparkline(trend, paidUsed) {
+    const svg = document.getElementById('coe-spark');
+    if (!svg || !trend || trend.length < 2) return;
+    const W = 600, H = 110, padL = 44, padR = 12, padT = 14, padB = 22;
+    const xs = (i) => padL + (i / (trend.length - 1)) * (W - padL - padR);
+    const prems = trend.map(t => t.premium);
+    let lo = Math.min(...prems, paidUsed || Infinity);
+    let hi = Math.max(...prems, paidUsed || -Infinity);
+    const range = Math.max(1, hi - lo);
+    lo -= range * 0.08; hi += range * 0.08;
+    const ys = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+
+    let pts = trend.map((t, i) => `${xs(i)},${ys(t.premium)}`).join(' ');
+    let area = `M${xs(0)},${H - padB} L${pts.split(' ').join(' L')} L${xs(trend.length - 1)},${H - padB} Z`;
+
+    let dots = trend.map((t, i) =>
+      `<circle class="coe-spark-dot" cx="${xs(i)}" cy="${ys(t.premium)}" r="2.5"/>`
+    ).join('');
+
+    // Y-axis gridlines (3 ticks)
+    const ticks = [lo + range * 0.15, lo + range * 0.5, lo + range * 0.85];
+    const grid = ticks.map(v =>
+      `<line class="coe-spark-axis" x1="${padL}" x2="${W - padR}" y1="${ys(v)}" y2="${ys(v)}"/>` +
+      `<text class="coe-spark-label" x="${padL - 6}" y="${ys(v) + 3}" text-anchor="end">$${(v / 1000).toFixed(0)}k</text>`
+    ).join('');
+
+    // X-axis: first, mid, last month labels
+    const xLabels = [0, Math.floor(trend.length / 2), trend.length - 1].map(i =>
+      `<text class="coe-spark-label" x="${xs(i)}" y="${H - 6}" text-anchor="middle">${fmtMonth(trend[i].month)}</text>`
+    ).join('');
+
+    // Reference line: what user paid
+    let paidLine = '';
+    if (paidUsed && paidUsed >= lo && paidUsed <= hi) {
+      paidLine =
+        `<line class="coe-spark-paid" x1="${padL}" x2="${W - padR}" y1="${ys(paidUsed)}" y2="${ys(paidUsed)}"/>` +
+        `<text class="coe-spark-label" x="${W - padR}" y="${ys(paidUsed) - 4}" text-anchor="end" style="fill:var(--green);font-weight:600">Paid Jun '21 ~$${(paidUsed / 1000).toFixed(0)}k</text>`;
+    }
+
+    svg.innerHTML = grid + paidLine +
+      `<path class="coe-spark-area" d="${area}"/>` +
+      `<polyline class="coe-spark-line" points="${pts}"/>` +
+      dots + xLabels;
+  }
+
+  function renderCoe() {
+    const sec = document.getElementById('coe-section');
+    if (!coe || !coe.latest_premium) { sec.style.display = 'none'; return; }
+    sec.style.display = '';
+
+    const fmtK = n => '$' + Math.round(n / 1000) + 'k';
+    const fmtFull = n => '$' + Math.round(n).toLocaleString();
+
+    document.getElementById('coe-latest').textContent = fmtK(coe.latest_premium);
+    document.getElementById('coe-latest-sub').textContent =
+      `${fmtMonth(coe.latest_month)} · round ${coe.latest_bidding_no}`;
+
+    if (coe.coe_paid_used) {
+      document.getElementById('coe-paid').textContent = fmtK(coe.coe_paid_used);
+      document.getElementById('coe-paid-sub').textContent =
+        coe.coe_paid_source === 'config'
+          ? 'From your config (exact)'
+          : 'Avg of Jun 2021 Cat B rounds';
+    }
+
+    const deltaKpi = document.getElementById('coe-delta-kpi');
+    if (coe.delta_vs_paid != null) {
+      const sign = coe.delta_vs_paid >= 0 ? '+' : '−';
+      document.getElementById('coe-delta').textContent =
+        sign + fmtK(Math.abs(coe.delta_vs_paid)) + ` (${coe.delta_pct >= 0 ? '+' : ''}${coe.delta_pct}%)`;
+      deltaKpi.classList.toggle('delta-up',   coe.delta_vs_paid > 0);
+      deltaKpi.classList.toggle('delta-down', coe.delta_vs_paid < 0);
+    }
+
+    if (coe.pqp_3mo_avg) {
+      document.getElementById('coe-pqp').textContent = fmtK(coe.pqp_3mo_avg);
+    }
+
+    // Sparkline
+    renderCoeSparkline(coe.trend_12mo || [], coe.coe_paid_used);
+    if (coe.trend_12mo && coe.trend_12mo.length) {
+      document.getElementById('coe-chart-sub').textContent =
+        `${fmtMonth(coe.trend_12mo[0].month)} → ${fmtMonth(coe.trend_12mo[coe.trend_12mo.length - 1].month)} · monthly average`;
+    }
+
+    // Commentary
+    const replacementGap = coe.delta_vs_paid;
+    let commentary = '';
+    if (replacementGap && replacementGap > 0) {
+      commentary =
+        `Replacing your X3 today would cost <strong>${fmtFull(replacementGap)} more on COE alone</strong> ` +
+        `(${coe.delta_pct}% above what you paid in Jun 2021). ` +
+        `That is far larger than the ~$2,700–$3,000 PARF difference between selling before vs. after Jun 23, ` +
+        `which strengthens the case to <strong>keep the car</strong> unless you have a clear replacement plan. ` +
+        `If you do sell, the high-COE environment is also keeping resale prices elevated — see the asking-price band above.`;
+    } else if (replacementGap && replacementGap < 0) {
+      commentary =
+        `COE is currently <strong>${fmtFull(Math.abs(replacementGap))} below</strong> what you paid in Jun 2021 ` +
+        `(${coe.delta_pct}%). Cheaper replacement makes a sell-and-switch more viable than usual.`;
+    } else {
+      commentary = `COE today is roughly in line with your Jun 2021 level — replacement cost is neutral.`;
+    }
+    document.getElementById('coe-commentary').innerHTML = commentary;
+
+    // PARF card COE rebate rows (precise)
+    if (coe.rebate_now) {
+      document.getElementById('coe-row-now-label').textContent =
+        `COE Rebate (${coe.rebate_now.months_left} mths left)`;
+      document.getElementById('coe-row-now').innerHTML =
+        `${fmtFull(coe.rebate_now.amount)} <small>*</small>`;
+    }
+    if (coe.rebate_after_jun) {
+      document.getElementById('coe-row-after-label').textContent =
+        `COE Rebate (${coe.rebate_after_jun.months_left} mths left)`;
+      document.getElementById('coe-row-after').innerHTML =
+        `${fmtFull(coe.rebate_after_jun.amount)} <small>*</small>`;
+    }
+
+    // Update Total Dereg Value rows: PARF range + precise COE rebate
+    if (coe.rebate_now) {
+      const lo = 40500 + coe.rebate_now.amount;
+      const hi = 45000 + coe.rebate_now.amount;
+      document.getElementById('dereg-now').textContent =
+        `~${fmtFull(lo)}–${fmtFull(hi)}`;
+    }
+    if (coe.rebate_after_jun) {
+      const lo = 37800 + coe.rebate_after_jun.amount;
+      const hi = 42000 + coe.rebate_after_jun.amount;
+      document.getElementById('dereg-after').textContent =
+        `~${fmtFull(lo)}–${fmtFull(hi)}`;
+    }
+
+    // PQP renewal info
+    if (coe.pqp_3mo_avg) {
+      const pqp = document.getElementById('coe-pqp-info');
+      pqp.style.display = '';
+      pqp.innerHTML =
+        `<strong>10-yr COE renewal scenario (Jun 2031):</strong> If you renew instead of dereg, ` +
+        `expected PQP ≈ <strong>${fmtFull(coe.pqp_3mo_avg)}</strong> based on the current 3-month average. ` +
+        `Informational only — you would pay this in 2031 prices, not today's.`;
+    }
+
+    // Verdict bullets — extend with COE replacement-cost reasoning
+    if (replacementGap && replacementGap > 0) {
+      const keepUl = document.getElementById('verdict-pros-keep');
+      const li1 = document.createElement('li');
+      li1.innerHTML = `<strong>Replacement COE costs ${fmtFull(replacementGap)} more</strong> than you paid (${coe.delta_pct}% higher) — keeping avoids that hit.`;
+      keepUl.insertBefore(li1, keepUl.firstChild);
+
+      const sellUl = document.getElementById('verdict-pros-sell');
+      const li2 = document.createElement('li');
+      li2.innerHTML = `Today's high Cat B (${fmtFull(coe.latest_premium)}) supports elevated 2021 resale prices.`;
+      sellUl.appendChild(li2);
+    }
   }
 
   // ── Filter buttons (dynamic counts) ────────────────────
@@ -779,6 +1042,7 @@
       const d = await resp.json();
       listings = d.listings || [];
       stats = d.stats || {};
+      coe = d.coe || null;
       daysToCutoff = d.days_to_parf_cutoff;
       if (d.generated_at) {
         document.getElementById('hdr-pulled').textContent =
@@ -795,6 +1059,7 @@
     renderStats();
     renderFilters();
     applyFilterAndSort();
+    renderCoe();
     initYourCar();
   }
   load();

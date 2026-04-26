@@ -1,9 +1,11 @@
 {
-  "generated_at": "2026-04-26T04:54:53.408380+00:00",
+  "generated_at": "2026-04-26T14:22:01.988667+00:00",
   "your_car": {
     "model": "BMW X3 sDrive20i",
     "reg_date": "23-Jun-2021",
-    "parf_cutoff": "23-Jun-2026"
+    "parf_cutoff": "23-Jun-2026",
+    "coe_expiry": "23-Jun-2031",
+    "coe_paid": null
   },
   "days_to_parf_cutoff": 58,
   "stats": {
@@ -18,6 +20,75 @@
     "jun_price_avg": 147641,
     "est_your_car_low": 142800,
     "est_your_car_high": 152888
+  },
+  "coe": {
+    "latest_premium": 121000,
+    "latest_month": "2026-04",
+    "latest_bidding_no": 1,
+    "coe_paid_estimate": 58070,
+    "coe_paid_used": 58070,
+    "coe_paid_source": "estimate_jun2021_avg",
+    "pqp_3mo_avg": 113292,
+    "trend_12mo": [
+      {
+        "month": "2025-05",
+        "premium": 118439
+      },
+      {
+        "month": "2025-06",
+        "premium": 114835
+      },
+      {
+        "month": "2025-07",
+        "premium": 119350
+      },
+      {
+        "month": "2025-08",
+        "premium": 123949
+      },
+      {
+        "month": "2025-09",
+        "premium": 132196
+      },
+      {
+        "month": "2025-10",
+        "premium": 136444
+      },
+      {
+        "month": "2025-11",
+        "premium": 122446
+      },
+      {
+        "month": "2025-12",
+        "premium": 119501
+      },
+      {
+        "month": "2026-01",
+        "premium": 120367
+      },
+      {
+        "month": "2026-02",
+        "premium": 107946
+      },
+      {
+        "month": "2026-03",
+        "premium": 114785
+      },
+      {
+        "month": "2026-04",
+        "premium": 121000
+      }
+    ],
+    "delta_vs_paid": 62930,
+    "delta_pct": 108.4,
+    "rebate_now": {
+      "months_left": 61,
+      "amount": 29519
+    },
+    "rebate_after_jun": {
+      "months_left": 60,
+      "amount": 29035
+    }
   },
   "listings": [
     {

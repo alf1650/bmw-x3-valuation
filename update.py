@@ -19,7 +19,18 @@ YOUR_CAR = {
     "model": "BMW X3 sDrive20i",
     "reg_date": "23-Jun-2021",
     "parf_cutoff": "23-Jun-2026",  # 5-yr mark; PARF drops 75% → 70%
+    "coe_expiry": "23-Jun-2031",   # 10-yr mark; COE rebate = paid × months_left/120
+    # Optional: actual Cat B COE premium paid in Jun 2021. If None, we estimate
+    # from data.gov.sg as the average of the two Jun 2021 bidding rounds.
+    "coe_paid": None,
 }
+
+# data.gov.sg — COE Bidding Results dataset (free, no key)
+COE_DATASET_ID = "d_69b3380ad7e51aff3a7dcc84eba52b8a"
+COE_API_URL = (
+    "https://data.gov.sg/api/action/datastore_search"
+    f"?resource_id={COE_DATASET_ID}&limit=5000"
+)
 
 # Filtered (2021) and unfiltered (all years) listings
 LISTING_URLS = [
@@ -230,6 +241,141 @@ def compute_stats(listings: list[dict]) -> dict:
     }
 
 
+# ── COE (data.gov.sg) ───────────────────────────────────────────────────
+def fetch_coe_history() -> list[dict]:
+    """Fetch Cat B COE bidding history from data.gov.sg.
+
+    Returns a list of {month: 'YYYY-MM', bidding_no: int, premium: int}
+    sorted ascending by (month, bidding_no). Empty list on failure.
+    """
+    import gzip
+    import time
+    import zlib
+
+    last_err: Exception | None = None
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(
+                COE_API_URL,
+                headers={"User-Agent": HEADERS["User-Agent"], "Accept": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw = resp.read()
+                enc = resp.headers.get("Content-Encoding", "").lower()
+                if enc == "gzip":
+                    raw = gzip.decompress(raw)
+                elif enc == "deflate":
+                    raw = zlib.decompress(raw)
+                payload = json.loads(raw.decode("utf-8"))
+            break
+        except Exception as e:
+            last_err = e
+            time.sleep(2 ** attempt)
+    else:
+        print(f"  WARN: COE fetch failed: {last_err}")
+        return []
+
+    records = (payload.get("result") or {}).get("records") or []
+    out: list[dict] = []
+    for r in records:
+        klass = (r.get("vehicle_class") or "").strip()
+        if klass != "Category B":
+            continue
+        try:
+            premium = int(float(r.get("premium")))
+            bidding_no = int(r.get("bidding_no"))
+        except (TypeError, ValueError):
+            continue
+        month = (r.get("month") or "").strip()
+        if not re.match(r"^\d{4}-\d{2}$", month):
+            continue
+        out.append({"month": month, "bidding_no": bidding_no, "premium": premium})
+
+    out.sort(key=lambda x: (x["month"], x["bidding_no"]))
+    return out
+
+
+def _months_between(start: date, end: date) -> int:
+    """Whole-month count between two dates (LTA convention: floor)."""
+    if end < start:
+        return 0
+    months = (end.year - start.year) * 12 + (end.month - start.month)
+    if end.day < start.day:
+        months -= 1
+    return max(0, months)
+
+
+def compute_coe_metrics(history: list[dict], reg_date: date,
+                        coe_expiry: date, coe_paid_override: int | None) -> dict | None:
+    """Derive COE summary metrics from raw bidding history."""
+    if not history:
+        return None
+
+    latest = history[-1]
+    reg_month_key = f"{reg_date.year:04d}-{reg_date.month:02d}"
+    reg_month_rounds = [r["premium"] for r in history if r["month"] == reg_month_key]
+    coe_paid_estimate = (
+        round(sum(reg_month_rounds) / len(reg_month_rounds))
+        if reg_month_rounds else None
+    )
+    coe_paid_used = coe_paid_override if coe_paid_override else coe_paid_estimate
+
+    # 3-month avg (PQP approximation = avg of premiums in last 3 months)
+    last_3_months = sorted({r["month"] for r in history})[-3:]
+    pqp_pool = [r["premium"] for r in history if r["month"] in last_3_months]
+    pqp_3mo_avg = round(sum(pqp_pool) / len(pqp_pool)) if pqp_pool else None
+
+    # 12-month trend: monthly average premium for last 12 calendar months
+    recent_months = sorted({r["month"] for r in history})[-12:]
+    trend_12mo: list[dict] = []
+    for m in recent_months:
+        prems = [r["premium"] for r in history if r["month"] == m]
+        if prems:
+            trend_12mo.append({"month": m, "premium": round(sum(prems) / len(prems))})
+
+    delta_vs_paid = (
+        latest["premium"] - coe_paid_used if coe_paid_used else None
+    )
+    delta_pct = (
+        round((delta_vs_paid / coe_paid_used) * 100, 1)
+        if coe_paid_used and delta_vs_paid is not None else None
+    )
+
+    # Rebate calculations: rebate = coe_paid × (months_left / 120)
+    today = date.today()
+    parf_cutoff = datetime.strptime(YOUR_CAR["parf_cutoff"], "%d-%b-%Y").date()
+    rebate_now = None
+    rebate_after_jun = None
+    if coe_paid_used:
+        months_left_now = _months_between(today, coe_expiry)
+        months_left_after = _months_between(parf_cutoff, coe_expiry)
+        rebate_now = {
+            "months_left": months_left_now,
+            "amount": round(coe_paid_used * months_left_now / 120),
+        }
+        rebate_after_jun = {
+            "months_left": months_left_after,
+            "amount": round(coe_paid_used * months_left_after / 120),
+        }
+
+    return {
+        "latest_premium": latest["premium"],
+        "latest_month": latest["month"],
+        "latest_bidding_no": latest["bidding_no"],
+        "coe_paid_estimate": coe_paid_estimate,
+        "coe_paid_used": coe_paid_used,
+        "coe_paid_source": "config" if coe_paid_override else (
+            "estimate_jun2021_avg" if coe_paid_estimate else "unavailable"
+        ),
+        "pqp_3mo_avg": pqp_3mo_avg,
+        "trend_12mo": trend_12mo,
+        "delta_vs_paid": delta_vs_paid,
+        "delta_pct": delta_pct,
+        "rebate_now": rebate_now,
+        "rebate_after_jun": rebate_after_jun,
+    }
+
+
 # ── MAIN ────────────────────────────────────────────────────────────────
 def main() -> None:
     print(f"[{datetime.now().isoformat()}] Scraping sgCarMart…")
@@ -269,11 +415,31 @@ def main() -> None:
     cutoff = datetime.strptime(YOUR_CAR["parf_cutoff"], "%d-%b-%Y").date()
     days_to_cutoff = (cutoff - date.today()).days
 
+    # COE bidding history (best-effort; null if data.gov.sg unreachable)
+    print("Fetching COE bidding history (data.gov.sg)…")
+    coe_history = fetch_coe_history()
+    coe_block = None
+    if coe_history:
+        reg_dt = datetime.strptime(YOUR_CAR["reg_date"], "%d-%b-%Y").date()
+        expiry_dt = datetime.strptime(YOUR_CAR["coe_expiry"], "%d-%b-%Y").date()
+        coe_block = compute_coe_metrics(
+            coe_history, reg_dt, expiry_dt, YOUR_CAR.get("coe_paid")
+        )
+        if coe_block:
+            print(
+                f"  Cat B latest: ${coe_block['latest_premium']:,} ({coe_block['latest_month']}) · "
+                f"Jun-2021 est: ${coe_block['coe_paid_estimate']:,} · "
+                f"Δ {coe_block['delta_pct']}%"
+            )
+    else:
+        print("  WARN: COE history empty — section will be hidden in dashboard.")
+
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "your_car": YOUR_CAR,
         "days_to_parf_cutoff": days_to_cutoff,
         "stats": stats,
+        "coe": coe_block,
         "listings": listings_2021,
         "all_listings_count": len(all_listings),
         "source": "sgCarMart",
