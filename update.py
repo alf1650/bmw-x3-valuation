@@ -149,6 +149,21 @@ def parse_owners(s: str) -> int:
     return int(m.group(1)) if m else 0
 
 
+def parse_reg_year(reg_date: str) -> int | None:
+    """Extract a 4-digit year from a registration date string.
+
+    sgCarMart payloads can occasionally contain malformed fragments when
+    page chunks are concatenated. Return None instead of raising.
+    """
+    m = re.search(r"(?:^|-)\s*(\d{4})\s*$", reg_date or "")
+    if not m:
+        return None
+    try:
+        return int(m.group(1))
+    except ValueError:
+        return None
+
+
 def clean_url(u: str) -> str:
     u = u.replace("\\u0026", "&")
     return u.split("?")[0].rstrip("/")
@@ -203,7 +218,7 @@ def parse_listings(html: str) -> list[dict]:
             "trim": classify_trim(car_model),
             "price": price,
             "reg_date": reg_date,
-            "reg_year": int(reg_date.split("-")[-1]) if "-" in reg_date else None,
+            "reg_year": parse_reg_year(reg_date),
             "coe_left": coe_left,
             "coe_months": parse_coe_months(coe_left),
             "mileage": mileage,
