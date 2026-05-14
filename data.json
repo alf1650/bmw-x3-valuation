@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T05:42:55.816477+00:00",
+  "generated_at": "2026-05-14T05:42:06.041928+00:00",
   "your_car": {
     "model": "BMW X3 sDrive20i",
     "reg_date": "23-Jun-2021",
@@ -7,13 +7,13 @@
     "coe_expiry": "23-Jun-2031",
     "coe_paid": null
   },
-  "days_to_parf_cutoff": 41,
+  "days_to_parf_cutoff": 40,
   "stats": {
-    "count": 13,
+    "count": 14,
     "price_min": 135800,
     "price_max": 158800,
-    "price_avg": 147965,
-    "depr_avg": 23296,
+    "price_avg": 148310,
+    "depr_avg": 23374,
     "jun_count": 6,
     "jun_price_min": 142800,
     "jun_price_max": 151800,
@@ -102,7 +102,7 @@
       "coe_months": 56,
       "mileage": 132000,
       "owners": 2,
-      "depr_per_year": 22910,
+      "depr_per_year": 22920,
       "dealer": "Octane Motors Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1468854"
     },
@@ -117,7 +117,7 @@
       "coe_months": 61,
       "mileage": 105000,
       "owners": 2,
-      "depr_per_year": 22410,
+      "depr_per_year": 22420,
       "dealer": "Monster Motors Alliance Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1469089"
     },
@@ -132,7 +132,7 @@
       "coe_months": 61,
       "mileage": 122878,
       "owners": 2,
-      "depr_per_year": 22890,
+      "depr_per_year": 22910,
       "dealer": "Carrific Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1443517"
     },
@@ -147,7 +147,7 @@
       "coe_months": 61,
       "mileage": 91000,
       "owners": 2,
-      "depr_per_year": 22880,
+      "depr_per_year": 22890,
       "dealer": "CarChope SG Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-xline-1487686"
     },
@@ -162,7 +162,7 @@
       "coe_months": 59,
       "mileage": 67000,
       "owners": 3,
-      "depr_per_year": 23550,
+      "depr_per_year": 23560,
       "dealer": "Meyer Motors Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1494642"
     },
@@ -177,7 +177,7 @@
       "coe_months": 62,
       "mileage": 120535,
       "owners": 2,
-      "depr_per_year": 22750,
+      "depr_per_year": 22770,
       "dealer": "The Automotive Geeks",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1479448"
     },
@@ -192,7 +192,7 @@
       "coe_months": 61,
       "mileage": 106906,
       "owners": 2,
-      "depr_per_year": 23590,
+      "depr_per_year": 23610,
       "dealer": "Sime Darby Auto Selection Limited",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1500395"
     },
@@ -205,9 +205,9 @@
       "reg_year": 2021,
       "coe_left": "5y 1m",
       "coe_months": 61,
-      "mileage": 1005,
+      "mileage": 100500,
       "owners": 2,
-      "depr_per_year": 23570,
+      "depr_per_year": 23580,
       "dealer": "\u2014",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1499135"
     },
@@ -222,7 +222,7 @@
       "coe_months": 63,
       "mileage": 105428,
       "owners": 1,
-      "depr_per_year": 23160,
+      "depr_per_year": 23170,
       "dealer": "Republic Auto",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1494535"
     },
@@ -237,7 +237,7 @@
       "coe_months": 63,
       "mileage": 86000,
       "owners": 1,
-      "depr_per_year": 23480,
+      "depr_per_year": 23490,
       "dealer": "Queen's Car Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1489478"
     },
@@ -250,26 +250,41 @@
       "reg_year": 2021,
       "coe_left": "5y 1m",
       "coe_months": 61,
-      "mileage": 71600,
+      "mileage": 100500,
       "owners": 1,
-      "depr_per_year": 24290,
+      "depr_per_year": 24300,
       "dealer": "Eurokars Pre Owned",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-1499230"
     },
     {
-      "id": 1479579,
+      "id": 1501075,
       "variant": "BMW X3 sDrive20i M-Sport",
       "trim": "msport",
       "price": 152800,
-      "reg_date": "27-Aug-2021",
+      "reg_date": "06-Aug-2021",
       "reg_year": 2021,
-      "coe_left": "5y 3m",
-      "coe_months": 63,
-      "mileage": 95900,
-      "owners": 2,
-      "depr_per_year": 23510,
-      "dealer": "Borneo Motors (S)",
-      "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1479579"
+      "coe_left": "5y 2m",
+      "coe_months": 62,
+      "mileage": 101201,
+      "owners": 1,
+      "depr_per_year": 23810,
+      "dealer": "Sime Darby Auto Selection Limited",
+      "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1501075"
+    },
+    {
+      "id": 1501115,
+      "variant": "BMW X3 sDrive20i M-Sport",
+      "trim": "msport",
+      "price": 152800,
+      "reg_date": "28-Jul-2021",
+      "reg_year": 2021,
+      "coe_left": "",
+      "coe_months": 0,
+      "mileage": 97882,
+      "owners": 1,
+      "depr_per_year": 23930,
+      "dealer": "Sime Darby Auto Selection Limited",
+      "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1501115"
     },
     {
       "id": 1473734,
@@ -282,7 +297,7 @@
       "coe_months": 65,
       "mileage": 72000,
       "owners": 1,
-      "depr_per_year": 23860,
+      "depr_per_year": 23870,
       "dealer": "Trust Motoring Capital Pte Ltd",
       "url": "https://www.sgcarmart.com/used-cars/info/bmw-x3-sdrive20i-m-sport-1473734"
     }
